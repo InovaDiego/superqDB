@@ -1,5 +1,5 @@
 <?php
-// Incluimos la conexión a la base de datos 'superq'
+
 require 'conexion.php';
 
 // =======================================================

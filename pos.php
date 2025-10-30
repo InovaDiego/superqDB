@@ -9,8 +9,8 @@ if (!isset($_SESSION['carrito'])) {
 
 $productos = [];
 try {
-    // Consulta para obtener los productos del inventario
-    $sql = "SELECT id_producto, nombre_producto, precio, cantidad FROM PRODUCTOS ORDER BY nombre_producto ASC";
+    // 💡 MODIFICACIÓN 1: Incluir la columna 'ruta_imagen' en la consulta SQL
+    $sql = "SELECT id_producto, nombre_producto, precio, cantidad, ruta_imagen FROM PRODUCTOS ORDER BY nombre_producto ASC";
     $stmt = $pdo->query($sql);
     $productos = $stmt->fetchAll();
 } catch (PDOException $e) {
@@ -43,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['update_quantity']) |
 
 // =======================================================
 // LÓGICA CORREGIDA: AÑADIR PRODUCTO AL CARRITO (CON CANTIDAD VARIABLE)
-// 💡 ESTA LÓGICA HABÍA SIDO REEMPLAZADA EN TU CÓDIGO ANTERIOR Y AHORA SE RESTAURA
 // =======================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     $id = $_POST['id_producto'];
@@ -107,7 +106,8 @@ $total = $subtotal + $iva;
         body { font-family: Arial, sans-serif; display: flex; }
         .catalogo { flex: 2; padding: 20px; background-color: #f4f4f4; display: flex; flex-wrap: wrap; gap: 20px; }
         .producto-card { border: 1px solid #ccc; padding: 10px; width: 180px; text-align: center; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .producto-card img { max-width: 100%; height: auto; margin-bottom: 10px; }
+        /* Añadido estilo para la imagen */
+        .producto-card img { max-width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; } 
         .producto-card h4 { margin: 5px 0; font-size: 1em; }
         .producto-card p { font-size: 1.2em; color: #007bff; font-weight: bold; }
         .carrito { flex: 1; padding: 20px; background-color: #333; color: white; min-width: 350px; }
@@ -126,7 +126,14 @@ $total = $subtotal + $iva;
         <h2>Inventario (Use el campo Cantidad y Añadir)</h2>
         <?php foreach ($productos as $producto): ?>
             <div class="producto-card">
-                <p>📦</p> 
+                
+                <?php 
+                // Usamos la carpeta 'imagenes/' que tienes en tu proyecto
+                $ruta_img = isset($producto['ruta_imagen']) && !empty($producto['ruta_imagen']) 
+                            ? 'imagenes/' . htmlspecialchars($producto['ruta_imagen']) 
+                            : 'https://via.placeholder.com/100/CCCCCC/000000?text=Sin+Foto';
+                ?>
+                <img src="<?php echo $ruta_img; ?>" alt="<?php echo htmlspecialchars($producto['nombre_producto']); ?>">
                 <h4><?php echo htmlspecialchars($producto['nombre_producto']); ?></h4>
                 
                 <p>$<?php echo htmlspecialchars(number_format($producto['precio'], 2)); ?></p>
